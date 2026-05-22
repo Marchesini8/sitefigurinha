@@ -42,6 +42,29 @@ function extractTransactionHash(data) {
   );
 }
 
+function extractPixQrImage(data) {
+  return (
+    data.qr_code ||
+    data.qrCode ||
+    data.qrcode ||
+    data.qr_code_url ||
+    data.qrCodeUrl ||
+    data.pix_base64 ||
+    data.pixBase64 ||
+    data.pix?.qr_code ||
+    data.pix?.qrCode ||
+    data.pix?.qr_code_url ||
+    data.pix?.qrCodeUrl ||
+    data.pix?.qr_code_base64 ||
+    data.pix?.qrCodeBase64 ||
+    data.payment?.qr_code ||
+    data.payment?.qrCode ||
+    data.payment?.qr_code_url ||
+    data.payment?.qrCodeUrl ||
+    null
+  );
+}
+
 exports.createPixPayment = async ({ items, customer, delivery }) => {
   const normalizedItems = Array.isArray(items) ? items : [];
   const productTotal = normalizedItems.reduce((sum, item) => {
@@ -141,12 +164,7 @@ exports.createPixPayment = async ({ items, customer, delivery }) => {
       transaction_hash: transactionHash,
       status: response.data.status || "pending",
       pix_code: pixCode,
-      pix_base64:
-        response.data.qr_code ||
-        response.data.pix_base64 ||
-        response.data.qrCode ||
-        response.data.pix?.qr_code_base64 ||
-        null,
+      pix_base64: extractPixQrImage(response.data),
       charged_total: totalAmount,
       product_total: productTotal,
       shipping_total: FIXED_SHIPPING_AMOUNT,

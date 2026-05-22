@@ -37,6 +37,27 @@ function resetSubmitButton(button) {
   if (button) button.textContent = "Gerar Pix de R$ 19,90";
 }
 
+function buildQrCodeUrl(pixPayload = "") {
+  if (!pixPayload) return "";
+  return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data=${encodeURIComponent(
+    pixPayload
+  )}`;
+}
+
+function normalizeQrImageSource(qrImage = "", pixPayload = "") {
+  const value = String(qrImage || "").trim();
+
+  if (value.startsWith("data:image/") || value.startsWith("http://") || value.startsWith("https://")) {
+    return value;
+  }
+
+  if (value) {
+    return `data:image/png;base64,${value.replace(/\s/g, "")}`;
+  }
+
+  return buildQrCodeUrl(pixPayload);
+}
+
 async function checkOrderStatus() {
   if (!currentOrderId) return;
 
@@ -132,10 +153,10 @@ checkoutForm?.addEventListener("submit", async (event) => {
     if (pixCode) pixCode.value = data.pix_code || "";
 
     if (pixQrImage && pixQrEmpty) {
-      if (data.pix_base64) {
-        pixQrImage.src = data.pix_base64.startsWith("data:")
-          ? data.pix_base64
-          : `data:image/png;base64,${data.pix_base64}`;
+      const qrImageSource = normalizeQrImageSource(data.pix_base64, data.pix_code);
+
+      if (qrImageSource) {
+        pixQrImage.src = qrImageSource;
         pixQrImage.classList.add("is-visible");
         pixQrEmpty.classList.add("is-hidden");
       } else {
