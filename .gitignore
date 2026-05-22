@@ -8,3 +8,6 @@ start-server.cmd
 outputs/
 criar_planilha_*.mjs
 private/Planilha Fofinha.xlsx
+assets/cat-box.png
+assets/cat-sparkle.png
+assets/planilha-preview.png
