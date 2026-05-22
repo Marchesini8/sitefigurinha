@@ -170,7 +170,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
     setFeedback("Pix gerado. Pague usando o QR Code ou o copia e cola.", "success");
     deliveryStatus.textContent = currentTransactionHash
       ? "Aguardando confirmacao do pagamento."
-      : "Pix gerado. A confirmacao depende do retorno da IronPay.";
+      : "Pix gerado. Depois de pagar, clique em verificar pagamento.";
     startPolling();
   } catch (error) {
     setFeedback(error.message, "error");
