@@ -1,0 +1,48 @@
+const express = require("express");
+const path = require("path");
+const orderStore = require("../services/orderStore");
+const deliveryService = require("../services/deliveryService");
+
+const router = express.Router();
+
+router.get("/:orderId/status", (req, res) => {
+  const order = orderStore.getOrder(req.params.orderId);
+
+  if (!order) {
+    return res.status(404).json({ error: "Pedido nao encontrado." });
+  }
+
+  const payload = {
+    id: order.id,
+    status: order.status,
+    isPaid: order.isPaid,
+    deliveryPreference: order.deliveryPreference,
+    deliveryAttempts: order.deliveryAttempts,
+  };
+
+  if (order.isPaid) {
+    payload.downloadUrl = deliveryService.getDownloadUrl(order);
+  }
+
+  return res.json(payload);
+});
+
+router.get("/:orderId/download", (req, res) => {
+  const order = orderStore.getOrder(req.params.orderId);
+
+  if (!order || req.query.token !== order.downloadToken) {
+    return res.status(404).send("Link invalido.");
+  }
+
+  if (!order.isPaid) {
+    return res.status(403).send("Pagamento ainda nao confirmado.");
+  }
+
+  const filePath = path.resolve(
+    process.cwd(),
+    process.env.PRODUCT_FILE_PATH || "private/Album Completo - Figurinhas.pdf"
+  );
+  return res.download(filePath, "Album Completo - Figurinhas.pdf");
+});
+
+module.exports = router;
