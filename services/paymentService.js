@@ -2,7 +2,7 @@ const axios = require("axios");
 const paymentStatusStore = require("./paymentStatusStore");
 
 const FIXED_SHIPPING_AMOUNT = 0;
-const DEFAULT_ITEM_TITLE = "Album Completo";
+const DEFAULT_ITEM_TITLE = "Álbum Completo";
 
 function normalizeItemPrice(item) {
   const unitPrice = Number(item?.unitPrice || 0);
@@ -17,7 +17,7 @@ function normalizeItemPrice(item) {
 function requireEnv(name) {
   if (process.env[name]) return process.env[name];
 
-  const error = new Error(`${name} nao configurado no .env.`);
+  const error = new Error(`${name} não configurado no .env.`);
   error.statusCode = 500;
   throw error;
 }
@@ -145,7 +145,7 @@ exports.createPixPayment = async ({ items, customer, delivery }) => {
     const transactionHash = extractTransactionHash(response.data);
 
     if (!pixCode) {
-      const error = new Error(`IronPay respondeu sem codigo Pix valido: ${JSON.stringify(response.data)}`);
+      const error = new Error(`IronPay respondeu sem código Pix válido: ${JSON.stringify(response.data)}`);
       error.statusCode = 502;
       throw error;
     }

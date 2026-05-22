@@ -1,6 +1,6 @@
-# Album Completo
+# Álbum Completo
 
-Site de venda do PDF digital das figurinhas, com checkout Pix, webhook de pagamento e download liberado somente apos confirmacao.
+Site de venda do PDF digital das figurinhas, com checkout Pix, webhook de pagamento e download liberado somente após a confirmação.
 
 ## Deploy no Railway
 
@@ -16,8 +16,8 @@ O Railway usa `npm start` e a rota `/health` como healthcheck.
 
 ## Produto
 
-- Nome: `Album Completo`
+- Nome: `Álbum Completo`
 - Valor: `R$ 19,90`
 - Arquivo protegido: `private/Album Completo - Figurinhas.pdf`
 
-O arquivo da pasta `private` nao e servido como estatico. Ele so sai pela rota de download quando o pedido esta pago e com token valido.
+O arquivo da pasta `private` não é servido como estático. Ele só sai pela rota de download quando o pedido está pago e com token válido.

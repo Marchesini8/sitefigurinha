@@ -6,7 +6,7 @@ function validateWebhookKey(receivedKey) {
   const expectedKey = process.env.IRONPAY_WEBHOOK_SECRET || process.env.PAYMENT_API_KEY;
 
   if (!expectedKey) {
-    const error = new Error("IRONPAY_WEBHOOK_SECRET nao configurado no .env.");
+    const error = new Error("IRONPAY_WEBHOOK_SECRET não configurado no .env.");
     error.statusCode = 500;
     throw error;
   }

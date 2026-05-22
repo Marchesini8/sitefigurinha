@@ -9,7 +9,7 @@ router.get("/:orderId/status", (req, res) => {
   const order = orderStore.getOrder(req.params.orderId);
 
   if (!order) {
-    return res.status(404).json({ error: "Pedido nao encontrado." });
+    return res.status(404).json({ error: "Pedido não encontrado." });
   }
 
   const payload = {
@@ -35,7 +35,7 @@ router.get("/:orderId/download", (req, res) => {
   }
 
   if (!order.isPaid) {
-    return res.status(403).send("Pagamento ainda nao confirmado.");
+    return res.status(403).send("Pagamento ainda não confirmado.");
   }
 
   const filePath = path.resolve(

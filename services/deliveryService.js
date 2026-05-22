@@ -26,7 +26,7 @@ function normalizePhone(phone = "") {
 async function sendEmail(order, downloadUrl) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    return { channel: "email", sent: false, reason: "RESEND_API_KEY nao configurado." };
+    return { channel: "email", sent: false, reason: "RESEND_API_KEY não configurado." };
   }
 
   const fileBytes = await fs.readFile(getProductFilePath());
@@ -38,15 +38,15 @@ async function sendEmail(order, downloadUrl) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.DELIVERY_FROM_EMAIL || "Album Completo <entrega@example.com>",
+      from: process.env.DELIVERY_FROM_EMAIL || "Álbum Completo <entrega@example.com>",
       to: [order.customer.email],
-      subject: "Seu PDF do Album Completo chegou",
+      subject: "Seu PDF do Álbum Completo chegou",
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111827">
           <h1>Obrigado pela compra, ${order.customer.name}!</h1>
-          <p>Seu PDF do Album Completo esta anexado neste email.</p>
-          <p>Se preferir, tambem pode baixar pelo link abaixo:</p>
-          <p><a href="${downloadUrl}">Baixar PDF do Album Completo</a></p>
+          <p>Seu PDF do Álbum Completo está anexado neste e-mail.</p>
+          <p>Se preferir, também pode baixar pelo link abaixo:</p>
+          <p><a href="${downloadUrl}">Baixar PDF do Álbum Completo</a></p>
         </div>
       `,
       attachments: [
@@ -60,7 +60,7 @@ async function sendEmail(order, downloadUrl) {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Erro ao enviar email: ${text}`);
+    throw new Error(`Erro ao enviar e-mail: ${text}`);
   }
 
   return { channel: "email", sent: true };
@@ -70,7 +70,7 @@ async function sendWhatsapp(order, downloadUrl) {
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   if (!token || !phoneNumberId) {
-    return { channel: "whatsapp", sent: false, reason: "WhatsApp Cloud API nao configurado." };
+    return { channel: "whatsapp", sent: false, reason: "WhatsApp Cloud API não configurado." };
   }
 
   const to = normalizePhone(order.customer.phone);
@@ -90,7 +90,7 @@ async function sendWhatsapp(order, downloadUrl) {
       type: "text",
       text: {
         preview_url: true,
-        body: `Pagamento confirmado. Aqui esta seu PDF do Album Completo: ${downloadUrl}`,
+        body: `Pagamento confirmado. Aqui está seu PDF do Álbum Completo: ${downloadUrl}`,
       },
     }),
   });
@@ -105,7 +105,7 @@ async function sendWhatsapp(order, downloadUrl) {
 
 async function deliverOrder(order) {
   if (!order?.isPaid) {
-    return { delivered: false, reason: "Pedido ainda nao pago." };
+    return { delivered: false, reason: "Pedido ainda não pago." };
   }
 
   const downloadUrl = getDownloadUrl(order);

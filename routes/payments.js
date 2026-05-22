@@ -14,11 +14,11 @@ router.post("/checkout", async (req, res) => {
 
     if (!customer?.name || !customer?.email || !customer?.phone || !customer?.document) {
       return res.status(400).json({
-        error: "Informe nome, email, WhatsApp e CPF para gerar o Pix.",
+        error: "Informe nome, e-mail, WhatsApp e CPF para gerar o Pix.",
       });
     }
 
-    const productName = process.env.PRODUCT_NAME || "Album Completo";
+    const productName = process.env.PRODUCT_NAME || "Álbum Completo";
     const productPrice = Number(process.env.PRODUCT_PRICE || 19.9);
     const item = {
       title: productName,

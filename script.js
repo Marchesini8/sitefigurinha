@@ -65,7 +65,7 @@ async function checkOrderStatus() {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || "Nao foi possivel consultar o pedido.");
+    throw new Error(data.error || "Não foi possível consultar o pedido.");
   }
 
   if (data.isPaid) {
@@ -79,7 +79,7 @@ async function checkOrderStatus() {
     deliveryStatus.innerHTML = `
       <div class="download-ready">
         <strong>Pagamento confirmado!</strong>
-        <span>Seu PDF do Album Completo esta liberado para download.</span>
+        <span>Seu PDF do Álbum Completo está liberado para download.</span>
         ${downloadButton}
       </div>
     `;
@@ -88,7 +88,7 @@ async function checkOrderStatus() {
   }
 
   deliveryStatus.textContent =
-    "Pagamento ainda pendente. Depois de pagar, a confirmacao pode levar alguns instantes.";
+    "Pagamento ainda pendente. Depois de pagar, a confirmação pode levar alguns instantes.";
 }
 
 function startPolling() {
@@ -144,7 +144,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Nao foi possivel gerar o Pix.");
+      throw new Error(data.error || "Não foi possível gerar o Pix.");
     }
 
     currentOrderId = data.order_id;
@@ -169,7 +169,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
     pixResult?.setAttribute("aria-hidden", "false");
     setFeedback("Pix gerado. Pague usando o QR Code ou o copia e cola.", "success");
     deliveryStatus.textContent = currentTransactionHash
-      ? "Aguardando confirmacao do pagamento."
+      ? "Aguardando confirmação do pagamento."
       : "Pix gerado. Depois de pagar, clique em verificar pagamento.";
     startPolling();
   } catch (error) {
@@ -191,9 +191,9 @@ copyPixButton?.addEventListener("click", async () => {
     document.execCommand("copy");
   }
 
-  copyPixButton.textContent = "Codigo copiado";
+  copyPixButton.textContent = "Código copiado";
   window.setTimeout(() => {
-    copyPixButton.textContent = "Copiar codigo Pix";
+    copyPixButton.textContent = "Copiar código Pix";
   }, 1600);
 });
 

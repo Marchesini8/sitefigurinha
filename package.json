@@ -1,7 +1,7 @@
 {
   "name": "album-completo-landing",
   "version": "1.0.0",
-  "description": "Landing page e checkout Pix para vender o PDF Album Completo.",
+  "description": "Landing page e checkout Pix para vender o PDF Álbum Completo.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
