@@ -22,9 +22,48 @@ let checkoutTracked = false;
 let purchaseTracked = false;
 let previewTracked = false;
 
+const pixelProductParams = {
+  content_name: "Album da Copa 2026 Completo em PDF",
+  content_type: "product",
+  currency: "BRL",
+  value: 19.9,
+};
+
 function trackPixel(eventName, params = {}) {
   if (typeof window.fbq === "function") {
     window.fbq("track", eventName, params);
+  }
+}
+
+function trackCustomPixel(eventName, params = {}) {
+  if (typeof window.fbq === "function") {
+    window.fbq("trackCustom", eventName, params);
+  }
+}
+
+function getPurchaseStorageKey(orderId) {
+  return `purchase_tracked_${orderId}`;
+}
+
+function hasTrackedPurchase(orderId) {
+  if (!orderId) return purchaseTracked;
+
+  try {
+    return window.localStorage.getItem(getPurchaseStorageKey(orderId)) === "1";
+  } catch {
+    return purchaseTracked;
+  }
+}
+
+function markPurchaseTracked(orderId) {
+  purchaseTracked = true;
+
+  if (!orderId) return;
+
+  try {
+    window.localStorage.setItem(getPurchaseStorageKey(orderId), "1");
+  } catch {
+    // Ignore storage failures; the in-memory guard still prevents repeats in this session.
   }
 }
 
@@ -57,12 +96,7 @@ function openCheckout() {
   document.body.style.overflow = "hidden";
 
   if (!checkoutTracked) {
-    trackPixel("InitiateCheckout", {
-      content_name: "Album da Copa 2026 Completo em PDF",
-      content_type: "product",
-      currency: "BRL",
-      value: 19.9,
-    });
+    trackPixel("InitiateCheckout", pixelProductParams);
     checkoutTracked = true;
   }
 }
@@ -81,12 +115,7 @@ function openPreview() {
   document.body.style.overflow = "hidden";
 
   if (!previewTracked) {
-    trackPixel("ViewContent", {
-      content_name: "Preview Album da Copa 2026 Completo em PDF",
-      content_type: "product",
-      currency: "BRL",
-      value: 19.9,
-    });
+    trackCustomPixel("PreviewOpened", pixelProductParams);
     previewTracked = true;
   }
 }
@@ -155,14 +184,9 @@ async function checkOrderStatus() {
         ${downloadButton}
       </div>
     `;
-    if (!purchaseTracked) {
-      trackPixel("Purchase", {
-        content_name: "Album da Copa 2026 Completo em PDF",
-        content_type: "product",
-        currency: "BRL",
-        value: 19.9,
-      });
-      purchaseTracked = true;
+    if (!hasTrackedPurchase(currentOrderId)) {
+      trackPixel("Purchase", pixelProductParams);
+      markPurchaseTracked(currentOrderId);
     }
     setFeedback("Pagamento confirmado. O PDF foi liberado.", "success");
     return;
@@ -180,6 +204,8 @@ function startPolling() {
     });
   }, 5000);
 }
+
+trackPixel("ViewContent", pixelProductParams);
 
 openCheckoutButtons.forEach((button) => button.addEventListener("click", openCheckout));
 openPreviewButtons.forEach((button) => button.addEventListener("click", openPreview));
@@ -273,12 +299,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
 
     pixResult?.classList.add("is-open");
     pixResult?.setAttribute("aria-hidden", "false");
-    trackPixel("AddPaymentInfo", {
-      content_name: "Album da Copa 2026 Completo em PDF",
-      content_type: "product",
-      currency: "BRL",
-      value: 19.9,
-    });
+    trackPixel("AddPaymentInfo", pixelProductParams);
     setFeedback("Pix gerado. Pague usando o QR Code ou o copia e cola.", "success");
     deliveryStatus.textContent = currentTransactionHash
       ? "Aguardando confirmacao do pagamento."
