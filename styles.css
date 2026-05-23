@@ -465,11 +465,16 @@ p {
 
 .preview-main {
   position: relative;
+  width: 100%;
   overflow: hidden;
+  padding: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
+  color: inherit;
   box-shadow: var(--shadow);
+  cursor: pointer;
+  appearance: none;
 }
 
 .preview-main img {
@@ -555,6 +560,10 @@ p {
 
 .locked-download .button {
   justify-self: start;
+}
+
+.preview-cta {
+  margin-top: 24px;
 }
 
 .testimonials {
@@ -680,6 +689,136 @@ p {
   background: var(--surface);
   box-shadow: var(--shadow);
   animation: modalIn 0.24s ease-out;
+}
+
+.preview-modal {
+  padding: 10px;
+}
+
+.preview-modal-card {
+  width: min(980px, 100%);
+  max-height: calc(100vh - 20px);
+  background: #f1f3f7;
+}
+
+.preview-modal-header {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+.pdf-preview-viewer {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  user-select: none;
+}
+
+.preview-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.08);
+}
+
+.preview-toolbar span {
+  color: var(--red-dark);
+  font-weight: 950;
+}
+
+.preview-pages {
+  display: grid;
+  gap: 16px;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.preview-page {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.12);
+}
+
+.preview-page img {
+  width: 100%;
+  min-height: 360px;
+  max-height: 620px;
+  object-fit: contain;
+  background: #fff;
+  pointer-events: none;
+}
+
+.preview-page figcaption {
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.preview-page::after {
+  content: "Preview protegido";
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(16, 24, 40, 0.88);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.blurred-page img {
+  filter: blur(1.6px) saturate(0.95);
+  transform: scale(1.01);
+}
+
+.blurred-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.36) 100%);
+  pointer-events: none;
+}
+
+.blurred-page::after {
+  content: "Bloqueado";
+  z-index: 2;
+  background: rgba(239, 35, 60, 0.94);
+}
+
+.preview-bottom-lock {
+  display: grid;
+  gap: 8px;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 18px;
+  border: 1px solid rgba(0, 166, 118, 0.24);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.preview-bottom-lock span {
+  color: var(--muted);
+  font-weight: 760;
+}
+
+.preview-bottom-lock .button {
+  justify-self: start;
 }
 
 .modal-close {
@@ -1040,6 +1179,21 @@ legend {
 
   .locked-download .button {
     justify-self: stretch;
+  }
+
+  .preview-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .preview-toolbar .button,
+  .preview-bottom-lock .button {
+    width: 100%;
+  }
+
+  .preview-page img {
+    min-height: 320px;
+    max-height: 520px;
   }
 
   .modal {

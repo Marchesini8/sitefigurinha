@@ -1,6 +1,8 @@
 const checkoutModal = document.querySelector("#checkout-modal");
-const closeModalButton = document.querySelector(".modal-close");
+const previewModal = document.querySelector("#preview-modal");
+const closeModalButtons = document.querySelectorAll(".modal-close");
 const openCheckoutButtons = document.querySelectorAll(".open-checkout");
+const openPreviewButtons = document.querySelectorAll(".open-preview");
 const checkoutForm = document.querySelector("#checkout-form");
 const paymentFeedback = document.querySelector("#payment-feedback");
 const pixResult = document.querySelector("#pix-result");
@@ -18,6 +20,7 @@ let currentTransactionHash = null;
 let pollTimer = null;
 let checkoutTracked = false;
 let purchaseTracked = false;
+let previewTracked = false;
 
 function trackPixel(eventName, params = {}) {
   if (typeof window.fbq === "function") {
@@ -48,6 +51,7 @@ function formatPhone(value = "") {
 }
 
 function openCheckout() {
+  closePreview();
   checkoutModal?.classList.add("is-open");
   checkoutModal?.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
@@ -66,7 +70,33 @@ function openCheckout() {
 function closeCheckout() {
   checkoutModal?.classList.remove("is-open");
   checkoutModal?.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
+  if (!previewModal?.classList.contains("is-open")) {
+    document.body.style.overflow = "";
+  }
+}
+
+function openPreview() {
+  previewModal?.classList.add("is-open");
+  previewModal?.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  if (!previewTracked) {
+    trackPixel("ViewContent", {
+      content_name: "Preview Album da Copa 2026 Completo em PDF",
+      content_type: "product",
+      currency: "BRL",
+      value: 19.9,
+    });
+    previewTracked = true;
+  }
+}
+
+function closePreview() {
+  previewModal?.classList.remove("is-open");
+  previewModal?.setAttribute("aria-hidden", "true");
+  if (!checkoutModal?.classList.contains("is-open")) {
+    document.body.style.overflow = "";
+  }
 }
 
 function setFeedback(message = "", type = "info") {
@@ -152,14 +182,31 @@ function startPolling() {
 }
 
 openCheckoutButtons.forEach((button) => button.addEventListener("click", openCheckout));
-closeModalButton?.addEventListener("click", closeCheckout);
+openPreviewButtons.forEach((button) => button.addEventListener("click", openPreview));
+closeModalButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    closeCheckout();
+    closePreview();
+  });
+});
 
 checkoutModal?.addEventListener("click", (event) => {
   if (event.target === checkoutModal) closeCheckout();
 });
 
+previewModal?.addEventListener("click", (event) => {
+  if (event.target === previewModal) closePreview();
+});
+
+previewModal?.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+});
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeCheckout();
+  if (event.key === "Escape") {
+    closeCheckout();
+    closePreview();
+  }
 });
 
 phoneInput?.addEventListener("input", (event) => {

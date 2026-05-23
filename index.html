@@ -85,7 +85,7 @@
 
           <div class="hero-actions">
             <button class="button open-checkout">Receber PDF Agora</button>
-            <a class="button ghost" href="#preview">Ver preview</a>
+            <button class="button ghost open-preview" type="button">Ver preview</button>
           </div>
 
           <div class="trust-grid" aria-label="Confianca da compra">
@@ -153,12 +153,13 @@
             <li>Download liberado automaticamente no checkout</li>
             <li>Ideal para acessar no celular, salvar ou imprimir</li>
           </ul>
+          <button class="button preview-cta open-preview" type="button">Abrir Preview do PDF</button>
         </div>
         <div class="preview-panel reveal" aria-label="Miniaturas de preview do PDF">
-          <div class="preview-main">
+          <button class="preview-main open-preview" type="button" aria-label="Abrir preview do PDF">
             <img src="assets/capa-album-copa.jpg" alt="Preview da capa do album" />
             <span class="preview-lock">Preview</span>
-          </div>
+          </button>
           <div class="preview-thumbs">
             <figure>
               <img src="assets/album-sticker-bg.jpg" alt="Miniatura bloqueada do PDF" />
@@ -319,6 +320,46 @@
           </div>
           <div class="delivery-status" id="delivery-status" role="status"></div>
         </section>
+      </div>
+    </div>
+
+    <div class="modal preview-modal" id="preview-modal" aria-hidden="true">
+      <div class="modal-card preview-modal-card" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+        <button class="modal-close preview-close" aria-label="Fechar">x</button>
+        <div class="modal-header preview-modal-header">
+          <img src="assets/panini-logo.png" alt="Panini" />
+          <div>
+            <span class="eyebrow">Preview protegido</span>
+            <h2 id="preview-title">Preview do PDF do Album da Copa 2026</h2>
+            <p>Visualizacao parcial para conferir a qualidade. O download completo so libera apos o Pix.</p>
+          </div>
+        </div>
+
+        <div class="pdf-preview-viewer" aria-label="Leitor de preview protegido">
+          <div class="preview-toolbar">
+            <span>Arquivo completo bloqueado</span>
+            <button class="button small open-checkout" type="button">Comprar e Baixar</button>
+          </div>
+          <div class="preview-pages">
+            <figure class="preview-page">
+              <img src="assets/capa-album-copa.jpg" alt="Pagina de preview da capa do PDF" draggable="false" />
+              <figcaption>Pagina 1 - Capa do material</figcaption>
+            </figure>
+            <figure class="preview-page blurred-page">
+              <img src="assets/album-sticker-bg.jpg" alt="Pagina interna protegida do PDF" draggable="false" />
+              <figcaption>Pagina interna - conteudo protegido</figcaption>
+            </figure>
+            <figure class="preview-page blurred-page">
+              <img src="assets/capa-album-copa.jpg" alt="Pagina de amostra protegida do PDF" draggable="false" />
+              <figcaption>Amostra de qualidade - download bloqueado</figcaption>
+            </figure>
+          </div>
+          <div class="preview-bottom-lock">
+            <strong>Gostou do material?</strong>
+            <span>Para acessar todas as paginas e baixar o PDF completo, finalize a compra por Pix.</span>
+            <button class="button open-checkout" type="button">Receber PDF Agora</button>
+          </div>
+        </div>
       </div>
     </div>
 
