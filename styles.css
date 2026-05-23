@@ -479,8 +479,9 @@ p {
 
 .preview-main img {
   width: 100%;
-  aspect-ratio: 1.45 / 1;
-  object-fit: cover;
+  aspect-ratio: 595 / 842;
+  object-fit: contain;
+  background: #fff;
 }
 
 .preview-lock {
@@ -511,10 +512,9 @@ p {
 
 .preview-thumbs img {
   width: 100%;
-  aspect-ratio: 1 / 0.78;
-  object-fit: cover;
-  filter: blur(1.4px) saturate(0.95);
-  transform: scale(1.02);
+  aspect-ratio: 595 / 842;
+  object-fit: contain;
+  background: #fff;
 }
 
 .preview-thumbs figure::after {
@@ -781,8 +781,7 @@ p {
 }
 
 .blurred-page img {
-  filter: blur(1.6px) saturate(0.95);
-  transform: scale(1.01);
+  filter: saturate(0.98);
 }
 
 .blurred-page::before {
@@ -790,7 +789,7 @@ p {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.36) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.18) 100%);
   pointer-events: none;
 }
 
