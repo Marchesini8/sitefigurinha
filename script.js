@@ -10,15 +10,57 @@ const pixCode = document.querySelector("#pix-code");
 const copyPixButton = document.querySelector(".copy-pix-button");
 const checkPaymentButton = document.querySelector(".check-payment-button");
 const deliveryStatus = document.querySelector("#delivery-status");
+const phoneInput = checkoutForm?.querySelector('input[name="phone"]');
+const documentInput = checkoutForm?.querySelector('input[name="document"]');
 
 let currentOrderId = null;
 let currentTransactionHash = null;
 let pollTimer = null;
+let checkoutTracked = false;
+let purchaseTracked = false;
+
+function trackPixel(eventName, params = {}) {
+  if (typeof window.fbq === "function") {
+    window.fbq("track", eventName, params);
+  }
+}
+
+function onlyDigits(value = "") {
+  return String(value).replace(/\D/g, "");
+}
+
+function formatCpf(value = "") {
+  return onlyDigits(value)
+    .slice(0, 11)
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function formatPhone(value = "") {
+  const digits = onlyDigits(value).slice(0, 11);
+
+  if (digits.length <= 2) return digits ? `(${digits}` : "";
+  if (digits.length <= 6) return digits.replace(/(\d{2})(\d{0,4})/, "($1) $2");
+  if (digits.length <= 10) return digits.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+
+  return digits.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+}
 
 function openCheckout() {
   checkoutModal?.classList.add("is-open");
   checkoutModal?.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
+
+  if (!checkoutTracked) {
+    trackPixel("InitiateCheckout", {
+      content_name: "Album da Copa 2026 Completo em PDF",
+      content_type: "product",
+      currency: "BRL",
+      value: 19.9,
+    });
+    checkoutTracked = true;
+  }
 }
 
 function closeCheckout() {
@@ -65,7 +107,7 @@ async function checkOrderStatus() {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || "Não foi possível consultar o pedido.");
+    throw new Error(data.error || "Nao foi possivel consultar o pedido.");
   }
 
   if (data.isPaid) {
@@ -79,16 +121,25 @@ async function checkOrderStatus() {
     deliveryStatus.innerHTML = `
       <div class="download-ready">
         <strong>Pagamento confirmado!</strong>
-        <span>Seu PDF do Álbum Completo está liberado para download.</span>
+        <span>Seu PDF do Album da Copa 2026 esta liberado para download.</span>
         ${downloadButton}
       </div>
     `;
+    if (!purchaseTracked) {
+      trackPixel("Purchase", {
+        content_name: "Album da Copa 2026 Completo em PDF",
+        content_type: "product",
+        currency: "BRL",
+        value: 19.9,
+      });
+      purchaseTracked = true;
+    }
     setFeedback("Pagamento confirmado. O PDF foi liberado.", "success");
     return;
   }
 
   deliveryStatus.textContent =
-    "Pagamento ainda pendente. Depois de pagar, a confirmação pode levar alguns instantes.";
+    "Pagamento ainda pendente. Depois de pagar, a confirmacao pode levar alguns instantes.";
 }
 
 function startPolling() {
@@ -109,6 +160,14 @@ checkoutModal?.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeCheckout();
+});
+
+phoneInput?.addEventListener("input", (event) => {
+  event.target.value = formatPhone(event.target.value);
+});
+
+documentInput?.addEventListener("input", (event) => {
+  event.target.value = formatCpf(event.target.value);
 });
 
 checkoutForm?.addEventListener("submit", async (event) => {
@@ -134,8 +193,8 @@ checkoutForm?.addEventListener("submit", async (event) => {
         customer: {
           name: payload.name,
           email: payload.email,
-          document: payload.document,
-          phone: payload.phone,
+          document: onlyDigits(payload.document),
+          phone: onlyDigits(payload.phone),
         },
         deliveryPreference: payload.deliveryPreference,
       }),
@@ -144,7 +203,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Não foi possível gerar o Pix.");
+      throw new Error(data.error || "Nao foi possivel gerar o Pix.");
     }
 
     currentOrderId = data.order_id;
@@ -167,9 +226,15 @@ checkoutForm?.addEventListener("submit", async (event) => {
 
     pixResult?.classList.add("is-open");
     pixResult?.setAttribute("aria-hidden", "false");
+    trackPixel("AddPaymentInfo", {
+      content_name: "Album da Copa 2026 Completo em PDF",
+      content_type: "product",
+      currency: "BRL",
+      value: 19.9,
+    });
     setFeedback("Pix gerado. Pague usando o QR Code ou o copia e cola.", "success");
     deliveryStatus.textContent = currentTransactionHash
-      ? "Aguardando confirmação do pagamento."
+      ? "Aguardando confirmacao do pagamento."
       : "Pix gerado. Depois de pagar, clique em verificar pagamento.";
     startPolling();
   } catch (error) {
@@ -191,9 +256,9 @@ copyPixButton?.addEventListener("click", async () => {
     document.execCommand("copy");
   }
 
-  copyPixButton.textContent = "Código copiado";
+  copyPixButton.textContent = "Codigo copiado";
   window.setTimeout(() => {
-    copyPixButton.textContent = "Copiar código Pix";
+    copyPixButton.textContent = "Copiar codigo Pix";
   }, 1600);
 });
 
