@@ -391,25 +391,6 @@ p {
   animation: shineMove 3.8s ease-in-out infinite;
 }
 
-.secure-note {
-  width: min(440px, 92vw);
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.93);
-  box-shadow: 0 16px 32px rgba(16, 24, 40, 0.1);
-}
-
-.secure-note strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.secure-note span {
-  color: var(--muted);
-  font-weight: 750;
-}
-
 .stats-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
