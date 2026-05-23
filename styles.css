@@ -519,36 +519,10 @@ p {
   background: #fff;
 }
 
-.preview-thumbs figcaption {
-  min-height: 42px;
-  padding: 10px;
-  color: var(--ink);
-  font-size: 0.82rem;
-  font-weight: 850;
-}
-
-.locked-download {
-  display: grid;
-  gap: 8px;
-  padding: 18px;
-  border: 1px solid rgba(0, 166, 118, 0.24);
-  border-radius: 8px;
-  background: rgba(0, 166, 118, 0.08);
-}
-
-.locked-download span,
 .price-card span,
 .testimonial-grid span {
   color: var(--muted);
   font-weight: 850;
-}
-
-.locked-download strong {
-  font-size: 1.1rem;
-}
-
-.locked-download .button {
-  justify-self: start;
 }
 
 .preview-cta {
@@ -747,34 +721,6 @@ p {
   object-fit: contain;
   background: #fff;
   pointer-events: none;
-}
-
-.preview-page figcaption {
-  padding: 12px 14px;
-  border-top: 1px solid var(--line);
-  color: var(--ink);
-  font-weight: 900;
-}
-
-.preview-bottom-lock {
-  display: grid;
-  gap: 8px;
-  max-width: 680px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 18px;
-  border: 1px solid rgba(0, 166, 118, 0.24);
-  border-radius: 8px;
-  background: #fff;
-}
-
-.preview-bottom-lock span {
-  color: var(--muted);
-  font-weight: 760;
-}
-
-.preview-bottom-lock .button {
-  justify-self: start;
 }
 
 .modal-close {
@@ -1145,17 +1091,12 @@ legend {
     padding-inline: 16px;
   }
 
-  .locked-download .button {
-    justify-self: stretch;
-  }
-
   .preview-toolbar {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .preview-toolbar .button,
-  .preview-bottom-lock .button {
+  .preview-toolbar .button {
     width: 100%;
   }
 
