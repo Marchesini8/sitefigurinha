@@ -3,6 +3,7 @@ const previewModal = document.querySelector("#preview-modal");
 const closeModalButtons = document.querySelectorAll(".modal-close");
 const openCheckoutButtons = document.querySelectorAll(".open-checkout");
 const openPreviewButtons = document.querySelectorAll(".open-preview");
+const heroVideo = document.querySelector(".hero-video");
 const checkoutForm = document.querySelector("#checkout-form");
 const paymentFeedback = document.querySelector("#payment-feedback");
 const pixResult = document.querySelector("#pix-result");
@@ -21,6 +22,21 @@ let pollTimer = null;
 let checkoutTracked = false;
 let purchaseTracked = false;
 let previewTracked = false;
+
+function playHeroVideoWithSound() {
+  if (!heroVideo) return;
+
+  heroVideo.muted = false;
+  heroVideo.volume = 1;
+
+  const playPromise = heroVideo.play();
+
+  if (playPromise?.catch) {
+    playPromise.catch(() => {
+      heroVideo.controls = true;
+    });
+  }
+}
 
 const pixelProductParams = {
   content_name: "Album da Copa 2026 Completo em PDF",
@@ -206,6 +222,13 @@ function startPolling() {
 }
 
 trackPixel("ViewContent", pixelProductParams);
+
+if (heroVideo) {
+  playHeroVideoWithSound();
+  window.addEventListener("load", playHeroVideoWithSound, { once: true });
+  document.addEventListener("pointerdown", playHeroVideoWithSound, { once: true, capture: true });
+  document.addEventListener("keydown", playHeroVideoWithSound, { once: true, capture: true });
+}
 
 openCheckoutButtons.forEach((button) => button.addEventListener("click", openCheckout));
 openPreviewButtons.forEach((button) => button.addEventListener("click", openPreview));
