@@ -27,6 +27,7 @@ app.get("/script.js", (req, res) => {
 
 app.use("/api/payments", paymentRoutes);
 app.use("/api/webhooks", webhookRoutes);
+app.use("/", webhookRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/meta", metaRoutes);
 

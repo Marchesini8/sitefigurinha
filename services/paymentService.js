@@ -65,6 +65,25 @@ function extractPixQrImage(data) {
   );
 }
 
+function normalizePostbackUrl(value = "") {
+  const configuredUrl = String(value || "").trim();
+  if (!configuredUrl) return "";
+
+  try {
+    const url = new URL(configuredUrl);
+    const normalizedPath = url.pathname.replace(/\/+/g, "/");
+
+    if (normalizedPath === "/ironpay") {
+      url.pathname = "/api/webhooks/ironpay";
+      return url.toString();
+    }
+  } catch {
+    return configuredUrl;
+  }
+
+  return configuredUrl;
+}
+
 exports.createPixPayment = async ({ items, customer, delivery }) => {
   const normalizedItems = Array.isArray(items) ? items : [];
   const productTotal = normalizedItems.reduce((sum, item) => {
@@ -105,7 +124,7 @@ exports.createPixPayment = async ({ items, customer, delivery }) => {
         payment_method: "pix",
         expire_in_days: expireInDays,
         transaction_origin: "api",
-        postback_url: process.env.IRONPAY_POSTBACK_URL || "",
+        postback_url: normalizePostbackUrl(process.env.IRONPAY_POSTBACK_URL),
         cart,
         customer: {
           name: customer.name,
