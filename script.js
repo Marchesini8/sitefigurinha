@@ -57,7 +57,7 @@ const pixelProductParams = {
 
 const purchasePixelParams = {
   ...pixelProductParams,
-  value: 0.0,
+  value: 19.9,
   currency: "BRL",
 };
 
