@@ -7,6 +7,7 @@ const cors = require("cors");
 const paymentRoutes = require("./routes/payments");
 const webhookRoutes = require("./routes/webhooks");
 const orderRoutes = require("./routes/orders");
+const metaRoutes = require("./routes/meta");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.get("/script.js", (req, res) => {
 app.use("/api/payments", paymentRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/meta", metaRoutes);
 
 app.get("/health", (req, res) => {
   res.json({

@@ -20,8 +20,11 @@ let currentOrderId = null;
 let currentTransactionHash = null;
 let pollTimer = null;
 let checkoutTracked = false;
+let addToCartTracked = false;
+let leadTracked = false;
 let purchaseTracked = false;
 let previewTracked = false;
+let latestCustomerData = null;
 
 function playHeroVideoWithSound() {
   if (!heroVideo) return;
@@ -41,9 +44,101 @@ function playHeroVideoWithSound() {
 const pixelProductParams = {
   content_name: "Album da Copa 2026 Completo em PDF",
   content_type: "product",
+  contents: [
+    {
+      id: "album-copa-2026-pdf",
+      quantity: 1,
+    },
+  ],
+  content_ids: ["album-copa-2026-pdf"],
   currency: "BRL",
   value: 19.9,
 };
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
+function setCookie(name, value, days = 90) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function captureFbclid() {
+  const fbclid = new URLSearchParams(window.location.search).get("fbclid");
+  if (!fbclid) return getCookie("_fbc");
+
+  const existing = getCookie("_fbc");
+  if (existing && existing.includes(fbclid)) return existing;
+
+  const fbc = `fb.1.${Date.now()}.${fbclid}`;
+  setCookie("_fbc", fbc);
+  return fbc;
+}
+
+function getOrCreateFbp() {
+  const existing = getCookie("_fbp");
+  if (existing) return existing;
+
+  const randomValue = Math.floor(Math.random() * 10 ** 16);
+  const fbp = `fb.1.${Date.now()}.${randomValue}`;
+  setCookie("_fbp", fbp);
+  return fbp;
+}
+
+function getMetaUserData(extra = {}) {
+  return {
+    fbp: getOrCreateFbp(),
+    fbc: captureFbclid(),
+    email: extra.email,
+    phone: extra.phone,
+  };
+}
+
+function createEventId(eventName) {
+  if (window.crypto?.randomUUID) {
+    return `${eventName}.${window.crypto.randomUUID()}`;
+  }
+
+  return `${eventName}.${Date.now()}.${Math.random().toString(16).slice(2)}`;
+}
+
+function sendCapiEvent({ eventName, eventId, params = {}, customer = {} }) {
+  return fetch("/api/meta/events", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      event_name: eventName,
+      event_id: eventId,
+      event_source_url: window.location.href,
+      custom_data: params,
+      user_data: getMetaUserData(customer),
+    }),
+  }).catch((error) => {
+    console.warn("[Meta CAPI] Falha ao enviar evento", eventName, error);
+  });
+}
+
+function trackMetaEvent(eventName, params = {}, options = {}) {
+  const eventId = options.eventId || createEventId(eventName);
+  const customer = options.customer || latestCustomerData || {};
+
+  if (typeof window.fbq === "function") {
+    window.fbq("track", eventName, params, { eventID: eventId });
+  }
+
+  sendCapiEvent({
+    eventName,
+    eventId,
+    params,
+    customer,
+  });
+
+  return eventId;
+}
 
 function trackPixel(eventName, params = {}) {
   if (typeof window.fbq === "function") {
@@ -112,7 +207,7 @@ function openCheckout() {
   document.body.style.overflow = "hidden";
 
   if (!checkoutTracked) {
-    trackPixel("InitiateCheckout", pixelProductParams);
+    trackMetaEvent("InitiateCheckout", pixelProductParams);
     checkoutTracked = true;
   }
 }
@@ -201,7 +296,7 @@ async function checkOrderStatus() {
       </div>
     `;
     if (!hasTrackedPurchase(currentOrderId)) {
-      trackPixel("Purchase", pixelProductParams);
+      trackMetaEvent("Purchase", pixelProductParams);
       markPurchaseTracked(currentOrderId);
     }
     setFeedback("Pagamento confirmado. O PDF foi liberado.", "success");
@@ -221,7 +316,8 @@ function startPolling() {
   }, 5000);
 }
 
-trackPixel("ViewContent", pixelProductParams);
+trackMetaEvent("PageView");
+trackMetaEvent("ViewContent", pixelProductParams);
 
 if (heroVideo) {
   playHeroVideoWithSound();
@@ -272,6 +368,10 @@ checkoutForm?.addEventListener("submit", async (event) => {
   const submitButton = checkoutForm.querySelector(".submit-payment");
   const formData = new FormData(checkoutForm);
   const payload = Object.fromEntries(formData.entries());
+  latestCustomerData = {
+    email: payload.email,
+    phone: onlyDigits(payload.phone),
+  };
 
   submitButton.disabled = true;
   submitButton.textContent = "Gerando Pix...";
@@ -322,7 +422,14 @@ checkoutForm?.addEventListener("submit", async (event) => {
 
     pixResult?.classList.add("is-open");
     pixResult?.setAttribute("aria-hidden", "false");
-    trackPixel("AddPaymentInfo", pixelProductParams);
+    if (!addToCartTracked) {
+      trackMetaEvent("AddToCart", pixelProductParams, { customer: latestCustomerData });
+      addToCartTracked = true;
+    }
+    if (!leadTracked) {
+      trackMetaEvent("Lead", pixelProductParams, { customer: latestCustomerData });
+      leadTracked = true;
+    }
     setFeedback("Pix gerado. Pague usando o QR Code ou o copia e cola.", "success");
     deliveryStatus.textContent = currentTransactionHash
       ? "Aguardando confirmacao do pagamento."

@@ -1,0 +1,142 @@
+const crypto = require("crypto");
+
+const META_GRAPH_VERSION = process.env.META_GRAPH_VERSION || "v20.0";
+const META_CAPI_URL = `https://graph.facebook.com/${META_GRAPH_VERSION}`;
+const SUPPORTED_EVENTS = new Set([
+  "PageView",
+  "ViewContent",
+  "AddToCart",
+  "InitiateCheckout",
+  "Purchase",
+  "Lead",
+]);
+
+function normalizeString(value = "") {
+  return String(value).trim().toLowerCase();
+}
+
+function normalizePhone(value = "") {
+  return String(value).replace(/\D/g, "");
+}
+
+function sha256(value) {
+  return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+function hashEmail(email) {
+  const normalized = normalizeString(email);
+  return normalized ? sha256(normalized) : undefined;
+}
+
+function hashPhone(phone) {
+  const normalized = normalizePhone(phone);
+  return normalized ? sha256(normalized) : undefined;
+}
+
+function getIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) return String(forwarded).split(",")[0].trim();
+  return req.socket?.remoteAddress || req.ip || "";
+}
+
+function compactObject(value = {}) {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, entry]) => entry !== undefined && entry !== null && entry !== "")
+  );
+}
+
+function buildUserData(req, payload = {}) {
+  const userData = payload.user_data || {};
+  return compactObject({
+    client_ip_address: getIp(req),
+    client_user_agent: req.headers["user-agent"],
+    fbp: userData.fbp,
+    fbc: userData.fbc,
+    em: hashEmail(userData.email),
+    ph: hashPhone(userData.phone),
+  });
+}
+
+function buildEvent(req, payload = {}) {
+  if (!SUPPORTED_EVENTS.has(payload.event_name)) {
+    const error = new Error("Evento Meta nao suportado.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (!payload.event_id) {
+    const error = new Error("event_id e obrigatorio para deduplicacao.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return {
+    event_name: payload.event_name,
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: payload.event_id,
+    event_source_url: payload.event_source_url,
+    action_source: "website",
+    user_data: buildUserData(req, payload),
+    custom_data: compactObject(payload.custom_data || {}),
+  };
+}
+
+async function sendEvent(req, payload) {
+  const pixelId = process.env.META_PIXEL_ID;
+  const accessToken = process.env.META_ACCESS_TOKEN;
+
+  if (!pixelId || !accessToken) {
+    const error = new Error("META_PIXEL_ID e META_ACCESS_TOKEN precisam estar configurados no .env.");
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const event = buildEvent(req, payload);
+  const url = `${META_CAPI_URL}/${pixelId}/events?access_token=${encodeURIComponent(accessToken)}`;
+
+  console.info("[Meta CAPI] Enviando evento", {
+    event_name: event.event_name,
+    event_id: event.event_id,
+    has_fbp: Boolean(event.user_data.fbp),
+    has_fbc: Boolean(event.user_data.fbc),
+    has_email: Boolean(event.user_data.em),
+    has_phone: Boolean(event.user_data.ph),
+    value: event.custom_data.value,
+    currency: event.custom_data.currency,
+  });
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ data: [event] }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    console.error("[Meta CAPI] Erro ao enviar evento", {
+      event_name: event.event_name,
+      event_id: event.event_id,
+      status: response.status,
+      response: data,
+    });
+    const error = new Error(data.error?.message || "Erro ao enviar evento para Meta CAPI.");
+    error.statusCode = response.status;
+    throw error;
+  }
+
+  console.info("[Meta CAPI] Evento enviado", {
+    event_name: event.event_name,
+    event_id: event.event_id,
+    fbtrace_id: data.fbtrace_id,
+    events_received: data.events_received,
+  });
+
+  return data;
+}
+
+module.exports = {
+  sendEvent,
+};

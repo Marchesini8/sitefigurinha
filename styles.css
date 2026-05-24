@@ -780,7 +780,7 @@ p {
   font-weight: 850;
 }
 
-.checkout-form input,
+.checkout-form input:not([type="radio"]),
 .pix-result textarea {
   width: 100%;
   min-height: 48px;
@@ -792,7 +792,7 @@ p {
   outline: none;
 }
 
-.checkout-form input:focus,
+.checkout-form input:not([type="radio"]):focus,
 .pix-result textarea:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(18, 103, 216, 0.16);
@@ -818,10 +818,23 @@ legend {
   display: flex !important;
   align-items: center;
   gap: 9px !important;
+  min-height: 58px;
   padding: 13px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff9d7;
+}
+
+.radio-card input[type="radio"] {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--blue);
+}
+
+.radio-card span {
+  line-height: 1.15;
 }
 
 .submit-payment,
@@ -1122,5 +1135,33 @@ legend {
   .checkout-form,
   .pix-result {
     padding: 18px;
+  }
+
+  .checkout-form {
+    gap: 12px;
+  }
+
+  fieldset {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  legend {
+    margin-bottom: 0;
+    font-size: 0.92rem;
+  }
+
+  .radio-card {
+    justify-content: center;
+    min-height: 64px;
+    padding: 9px 6px;
+    text-align: center;
+    font-size: 0.78rem;
+  }
+
+  .radio-card input[type="radio"] {
+    flex-basis: 18px;
+    width: 18px;
+    height: 18px;
   }
 }
