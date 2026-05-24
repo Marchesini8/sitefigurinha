@@ -55,6 +55,12 @@ const pixelProductParams = {
   value: 19.9,
 };
 
+const purchasePixelParams = {
+  ...pixelProductParams,
+  value: 0.0,
+  currency: "BRL",
+};
+
 function getCookie(name) {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : "";
@@ -296,7 +302,7 @@ async function checkOrderStatus() {
       </div>
     `;
     if (!hasTrackedPurchase(currentOrderId)) {
-      trackMetaEvent("Purchase", pixelProductParams);
+      trackMetaEvent("Purchase", purchasePixelParams);
       markPurchaseTracked(currentOrderId);
     }
     setFeedback("Pagamento confirmado. O PDF foi liberado.", "success");
