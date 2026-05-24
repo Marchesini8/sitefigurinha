@@ -255,6 +255,17 @@ function resetSubmitButton(button) {
   if (button) button.textContent = "Gerar Pix de R$ 19,90";
 }
 
+function scrollToPixResult() {
+  if (!pixResult) return;
+
+  window.requestAnimationFrame(() => {
+    pixResult.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+}
+
 function buildQrCodeUrl(pixPayload = "") {
   if (!pixPayload) return "";
   return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data=${encodeURIComponent(
@@ -428,6 +439,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
 
     pixResult?.classList.add("is-open");
     pixResult?.setAttribute("aria-hidden", "false");
+    scrollToPixResult();
     if (!addToCartTracked) {
       trackMetaEvent("AddToCart", pixelProductParams, { customer: latestCustomerData });
       addToCartTracked = true;
