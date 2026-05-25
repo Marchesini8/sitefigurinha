@@ -130,7 +130,7 @@ exports.createPixPayment = async ({ items, customer, delivery }) => {
           name: customer.name,
           email: customer.email,
           phone_number: customer.phone_number || customer.phone || process.env.DEFAULT_PHONE_NUMBER || "",
-          document: customer.document || customer.cpf || "",
+          document: customer.document || customer.cpf || process.env.DEFAULT_DOCUMENT || "",
           street_name: customer.street_name || delivery?.address || "",
           number: customer.number || delivery?.number || "",
           complement: customer.complement || delivery?.complement || "",

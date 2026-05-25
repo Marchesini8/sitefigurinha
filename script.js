@@ -14,7 +14,6 @@ const copyPixButton = document.querySelector(".copy-pix-button");
 const checkPaymentButton = document.querySelector(".check-payment-button");
 const deliveryStatus = document.querySelector("#delivery-status");
 const phoneInput = checkoutForm?.querySelector('input[name="phone"]');
-const documentInput = checkoutForm?.querySelector('input[name="document"]');
 
 let currentOrderId = null;
 let currentTransactionHash = null;
@@ -219,14 +218,6 @@ function onlyDigits(value = "") {
   return String(value).replace(/\D/g, "");
 }
 
-function formatCpf(value = "") {
-  return onlyDigits(value)
-    .slice(0, 11)
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-}
-
 function formatPhone(value = "") {
   const digits = onlyDigits(value).slice(0, 11);
 
@@ -419,10 +410,6 @@ phoneInput?.addEventListener("input", (event) => {
   event.target.value = formatPhone(event.target.value);
 });
 
-documentInput?.addEventListener("input", (event) => {
-  event.target.value = formatCpf(event.target.value);
-});
-
 checkoutForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -450,7 +437,6 @@ checkoutForm?.addEventListener("submit", async (event) => {
         customer: {
           name: payload.name,
           email: payload.email,
-          document: onlyDigits(payload.document),
           phone: onlyDigits(payload.phone),
         },
         deliveryPreference: payload.deliveryPreference,

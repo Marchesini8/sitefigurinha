@@ -12,9 +12,9 @@ router.post("/checkout", async (req, res) => {
   try {
     const { customer, deliveryPreference } = req.body;
 
-    if (!customer?.name || !customer?.email || !customer?.phone || !customer?.document) {
+    if (!customer?.name || !customer?.email || !customer?.phone) {
       return res.status(400).json({
-        error: "Informe nome, e-mail, WhatsApp e CPF para gerar o Pix.",
+        error: "Informe nome, e-mail e WhatsApp para gerar o Pix.",
       });
     }
 
