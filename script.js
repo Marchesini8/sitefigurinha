@@ -26,6 +26,8 @@ let purchaseTracked = false;
 let previewTracked = false;
 let latestCustomerData = null;
 
+const activeOrderStorageKey = "active_order";
+
 function playHeroVideoWithSound() {
   if (!heroVideo) return;
 
@@ -184,6 +186,35 @@ function markPurchaseTracked(orderId) {
   }
 }
 
+function saveActiveOrder(order = {}) {
+  try {
+    window.localStorage.setItem(activeOrderStorageKey, JSON.stringify(order));
+  } catch {
+    // The checkout still works if the browser blocks localStorage.
+  }
+}
+
+function restoreActiveOrder() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(activeOrderStorageKey) || "{}");
+    if (!saved.orderId) return;
+
+    currentOrderId = saved.orderId;
+    currentTransactionHash = saved.transactionHash || null;
+    latestCustomerData = saved.customer || null;
+  } catch {
+    // Ignore invalid persisted state.
+  }
+}
+
+function clearActiveOrder() {
+  try {
+    window.localStorage.removeItem(activeOrderStorageKey);
+  } catch {
+    // Nothing to clear.
+  }
+}
+
 function onlyDigits(value = "") {
   return String(value).replace(/\D/g, "");
 }
@@ -215,6 +246,15 @@ function openCheckout() {
   if (!checkoutTracked) {
     trackMetaEvent("InitiateCheckout", pixelProductParams);
     checkoutTracked = true;
+  }
+
+  if (currentOrderId) {
+    pixResult?.classList.add("is-open");
+    pixResult?.setAttribute("aria-hidden", "false");
+    deliveryStatus.textContent = "Consultando status do pagamento anterior...";
+    checkOrderStatus().catch((error) => {
+      deliveryStatus.textContent = error.message;
+    });
   }
 }
 
@@ -313,9 +353,12 @@ async function checkOrderStatus() {
       </div>
     `;
     if (!hasTrackedPurchase(currentOrderId)) {
-      trackMetaEvent("Purchase", purchasePixelParams);
+      trackMetaEvent("Purchase", purchasePixelParams, {
+        eventId: `Purchase.${currentOrderId}`,
+      });
       markPurchaseTracked(currentOrderId);
     }
+    clearActiveOrder();
     setFeedback("Pagamento confirmado. O PDF foi liberado.", "success");
     return;
   }
@@ -335,6 +378,7 @@ function startPolling() {
 
 trackMetaEvent("PageView");
 trackMetaEvent("ViewContent", pixelProductParams);
+restoreActiveOrder();
 
 if (heroVideo) {
   playHeroVideoWithSound();
@@ -421,6 +465,11 @@ checkoutForm?.addEventListener("submit", async (event) => {
 
     currentOrderId = data.order_id;
     currentTransactionHash = data.transaction_hash;
+    saveActiveOrder({
+      orderId: currentOrderId,
+      transactionHash: currentTransactionHash,
+      customer: latestCustomerData,
+    });
 
     if (pixCode) pixCode.value = data.pix_code || "";
 

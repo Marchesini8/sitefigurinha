@@ -12,7 +12,7 @@ router.post("/ironpay", async (req, res) => {
 
     webhookService.validateWebhookKey(receivedKey);
 
-    const result = await webhookService.processWebhook(req.body);
+    const result = await webhookService.processWebhook(req.body, req);
 
     return res.status(200).json({
       received: true,

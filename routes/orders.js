@@ -2,14 +2,24 @@ const express = require("express");
 const path = require("path");
 const orderStore = require("../services/orderStore");
 const deliveryService = require("../services/deliveryService");
+const paymentStatusStore = require("../services/paymentStatusStore");
 
 const router = express.Router();
 
 router.get("/:orderId/status", (req, res) => {
-  const order = orderStore.getOrder(req.params.orderId);
+  let order = orderStore.getOrder(req.params.orderId);
 
   if (!order) {
     return res.status(404).json({ error: "Pedido não encontrado." });
+  }
+
+  const payment = paymentStatusStore.getPayment(order.transactionHash);
+  if (!order.isPaid && payment?.isPaid) {
+    order = orderStore.updateOrder(order.id, {
+      status: payment.status,
+      isPaid: true,
+      paidAt: payment.paidAt || new Date().toISOString(),
+    });
   }
 
   const payload = {

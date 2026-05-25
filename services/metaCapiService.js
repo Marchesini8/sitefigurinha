@@ -11,6 +11,10 @@ const SUPPORTED_EVENTS = new Set([
   "Lead",
 ]);
 
+function getPublicBaseUrl() {
+  return (process.env.PUBLIC_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
+}
+
 function normalizeString(value = "") {
   return String(value).trim().toLowerCase();
 }
@@ -137,6 +141,38 @@ async function sendEvent(req, payload) {
   return data;
 }
 
+async function sendPurchaseFromOrder(req, order) {
+  if (!order?.isPaid) return null;
+
+  const value = Number(order.item?.price || process.env.PRODUCT_PRICE || 0);
+  const eventId = `Purchase.${order.id}`;
+
+  return sendEvent(req, {
+    event_name: "Purchase",
+    event_id: eventId,
+    event_source_url: getPublicBaseUrl(),
+    user_data: {
+      email: order.customer?.email,
+      phone: order.customer?.phone,
+    },
+    custom_data: {
+      content_name: order.item?.title || process.env.PRODUCT_NAME || "Album da Copa 2026 Completo em PDF",
+      content_type: "product",
+      content_ids: ["album-copa-2026-pdf"],
+      contents: [
+        {
+          id: "album-copa-2026-pdf",
+          quantity: 1,
+          item_price: value,
+        },
+      ],
+      currency: "BRL",
+      value,
+    },
+  });
+}
+
 module.exports = {
   sendEvent,
+  sendPurchaseFromOrder,
 };
