@@ -1,8 +1,6 @@
 const checkoutModal = document.querySelector("#checkout-modal");
-const previewModal = document.querySelector("#preview-modal");
 const closeModalButtons = document.querySelectorAll(".modal-close");
 const openCheckoutButtons = document.querySelectorAll(".open-checkout");
-const openPreviewButtons = document.querySelectorAll(".open-preview");
 const heroVideo = document.querySelector(".hero-video");
 const checkoutForm = document.querySelector("#checkout-form");
 const paymentFeedback = document.querySelector("#payment-feedback");
@@ -14,6 +12,8 @@ const copyPixButton = document.querySelector(".copy-pix-button");
 const checkPaymentButton = document.querySelector(".check-payment-button");
 const deliveryStatus = document.querySelector("#delivery-status");
 const phoneInput = checkoutForm?.querySelector('input[name="phone"]');
+const purchaseToast = document.querySelector("#purchase-toast");
+const purchaseToastName = document.querySelector("#purchase-toast-name");
 
 let currentOrderId = null;
 let currentTransactionHash = null;
@@ -22,11 +22,29 @@ let checkoutTracked = false;
 let addToCartTracked = false;
 let leadTracked = false;
 let purchaseTracked = false;
-let previewTracked = false;
 let latestCustomerData = null;
 
 const activeOrderStorageKey = "active_order";
 const externalIdCookieName = "site_external_id";
+const purchaseToastMessages = [
+  "Gabriel acabou de garantir seu PDF!!",
+  "Mariana acabou de garantir seu PDF!!",
+  "Carlos Eduardo Oliveira acabou de receber todas as figurinhas",
+  "Ana Ferreira acabou de garantir seu PDF!!",
+  "Rafael acabou de receber o PDF completo",
+  "Camila acabou de garantir seu PDF!!",
+  "Lucas acabou de liberar o album completo",
+  "Juliana acabou de receber todas as figurinhas",
+  "Bruno acabou de garantir seu PDF!!",
+  "Fernanda acabou de receber o PDF completo",
+  "Thiago acabou de garantir seu PDF!!",
+  "Patricia acabou de liberar o album completo",
+  "Mateus acabou de receber todas as figurinhas",
+  "Larissa acabou de garantir seu PDF!!",
+  "Eduardo acabou de receber o PDF completo",
+  "Beatriz acabou de liberar o album completo",
+];
+let purchaseToastIndex = 0;
 
 function playHeroVideoWithSound() {
   if (!heroVideo) return;
@@ -175,12 +193,6 @@ function trackPixel(eventName, params = {}) {
   }
 }
 
-function trackCustomPixel(eventName, params = {}) {
-  if (typeof window.fbq === "function") {
-    window.fbq("trackCustom", eventName, params);
-  }
-}
-
 function getPurchaseStorageKey(orderId) {
   return `purchase_tracked_${orderId}`;
 }
@@ -236,6 +248,22 @@ function clearActiveOrder() {
   }
 }
 
+function showPurchaseToast() {
+  if (!purchaseToast || !purchaseToastName) return;
+
+  const randomOffset = Math.floor(Math.random() * purchaseToastMessages.length);
+  purchaseToastName.textContent = purchaseToastMessages[
+    (purchaseToastIndex + randomOffset) % purchaseToastMessages.length
+  ];
+  purchaseToastIndex += 1;
+  purchaseToast.classList.remove("is-visible");
+  purchaseToast.setAttribute("aria-hidden", "false");
+
+  window.requestAnimationFrame(() => {
+    purchaseToast.classList.add("is-visible");
+  });
+}
+
 function onlyDigits(value = "") {
   return String(value).replace(/\D/g, "");
 }
@@ -251,7 +279,6 @@ function formatPhone(value = "") {
 }
 
 function openCheckout() {
-  closePreview();
   checkoutModal?.classList.add("is-open");
   checkoutModal?.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
@@ -274,28 +301,7 @@ function openCheckout() {
 function closeCheckout() {
   checkoutModal?.classList.remove("is-open");
   checkoutModal?.setAttribute("aria-hidden", "true");
-  if (!previewModal?.classList.contains("is-open")) {
-    document.body.style.overflow = "";
-  }
-}
-
-function openPreview() {
-  previewModal?.classList.add("is-open");
-  previewModal?.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-
-  if (!previewTracked) {
-    trackCustomPixel("PreviewOpened", pixelProductParams);
-    previewTracked = true;
-  }
-}
-
-function closePreview() {
-  previewModal?.classList.remove("is-open");
-  previewModal?.setAttribute("aria-hidden", "true");
-  if (!checkoutModal?.classList.contains("is-open")) {
-    document.body.style.overflow = "";
-  }
+  document.body.style.overflow = "";
 }
 
 function setFeedback(message = "", type = "info") {
@@ -400,12 +406,13 @@ if (heroVideo) {
   document.addEventListener("keydown", playHeroVideoWithSound, { once: true, capture: true });
 }
 
+window.setTimeout(showPurchaseToast, 2600);
+window.setInterval(showPurchaseToast, 14500);
+
 openCheckoutButtons.forEach((button) => button.addEventListener("click", openCheckout));
-openPreviewButtons.forEach((button) => button.addEventListener("click", openPreview));
 closeModalButtons.forEach((button) => {
   button.addEventListener("click", () => {
     closeCheckout();
-    closePreview();
   });
 });
 
@@ -413,18 +420,9 @@ checkoutModal?.addEventListener("click", (event) => {
   if (event.target === checkoutModal) closeCheckout();
 });
 
-previewModal?.addEventListener("click", (event) => {
-  if (event.target === previewModal) closePreview();
-});
-
-previewModal?.addEventListener("contextmenu", (event) => {
-  event.preventDefault();
-});
-
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeCheckout();
-    closePreview();
   }
 });
 

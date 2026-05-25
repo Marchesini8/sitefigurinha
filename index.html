@@ -47,6 +47,11 @@
       <span></span>
       <span></span>
     </div>
+    <div class="purchase-toast" id="purchase-toast" aria-live="polite" aria-hidden="true">
+      <span class="toast-check">✓</span>
+      <strong id="purchase-toast-name">Gabriel acabou de garantir seu PDF!!</strong>
+      <span class="toast-progress"></span>
+    </div>
 
     <header class="topbar">
       <a class="brand" href="#home" aria-label="Album da Copa 2026">
@@ -84,7 +89,7 @@
 
           <div class="hero-actions">
             <button class="button open-checkout">Garantir o PDF Agora</button>
-            <button class="button ghost open-preview" type="button">Ver preview</button>
+            <a class="button ghost" href="#preview">Ver figurinhas</a>
           </div>
 
           <div class="trust-grid" aria-label="Confianca da compra">
@@ -143,35 +148,36 @@
       </section>
 
       <section id="preview" class="preview-section">
-        <div class="preview-copy reveal">
-          <span class="eyebrow">Preview</span>
-          <h2>Veja 3 paginas do PDF antes de comprar.</h2>
-          <p>
-            Confira uma amostra com Brasil, Argentina e Portugal para ver a qualidade do material.
-          </p>
-          <ul class="check-list">
-            <li>Pagina 1</li>
-            <li>Pagina 2</li>
-            <li>Pagina 3</li>
-            <li>Ideal para acessar no celular, salvar ou imprimir</li>
-          </ul>
-          <button class="button preview-cta open-preview" type="button">Abrir Preview do PDF</button>
-        </div>
-        <div class="preview-panel reveal" aria-label="Miniaturas de preview do PDF">
-          <button class="preview-main open-preview" type="button" aria-label="Abrir preview do PDF">
-            <img src="assets/pdf-preview-page-1.png" alt="Preview real de uma pagina do PDF" />
-            <span class="preview-lock">Preview</span>
-          </button>
-          <div class="preview-thumbs">
-            <figure>
-              <img src="assets/pdf-preview-page-1.png" alt="Miniatura real do PDF com figurinhas do Brasil" />
-            </figure>
-            <figure>
-              <img src="assets/pdf-preview-page-2.png" alt="Miniatura real do PDF com figurinhas da Argentina" />
-            </figure>
-            <figure>
-              <img src="assets/pdf-preview-page-3.png" alt="Miniatura real do PDF com figurinhas de Portugal" />
-            </figure>
+        <div class="sticker-flow reveal" aria-label="Figurinhas do album passando">
+          <div class="sticker-track">
+            <article class="moving-sticker">
+              <img src="assets/stickers/alisson-becker.png" alt="Figurinha de Alisson Becker" />
+              <span>Alisson Becker</span>
+            </article>
+            <article class="moving-sticker is-raised">
+              <img src="assets/stickers/marquinhos.png" alt="Figurinha de Marquinhos" />
+              <span>Marquinhos</span>
+            </article>
+            <article class="moving-sticker">
+              <img src="assets/stickers/gabriel-magalhaes.png" alt="Figurinha de Gabriel Magalhaes" />
+              <span>Gabriel Magalhaes</span>
+            </article>
+            <article class="moving-sticker is-raised">
+              <img src="assets/stickers/bruno-guimaraes.png" alt="Figurinha de Bruno Guimaraes" />
+              <span>Bruno Guimaraes</span>
+            </article>
+            <article class="moving-sticker">
+              <img src="assets/stickers/vinicius-junior.png" alt="Figurinha de Vinicius Junior" />
+              <span>Vinicius Junior</span>
+            </article>
+            <article class="moving-sticker is-raised">
+              <img src="assets/stickers/casemiro.png" alt="Figurinha de Casemiro" />
+              <span>Casemiro</span>
+            </article>
+            <article class="moving-sticker">
+              <img src="assets/stickers/lucas-paqueta.png" alt="Figurinha de Lucas Paqueta" />
+              <span>Lucas Paqueta</span>
+            </article>
           </div>
         </div>
       </section>
@@ -179,16 +185,16 @@
       <section id="feedbacks" class="section testimonials">
         <div class="section-title reveal">
           <span class="eyebrow">Feedbacks de compradores</span>
-          <h2>Mais seguranca para comprar: entrega rapida, PDF completo e suporte simples.</h2>
+          <h2>Quem comprou parou de jogar dinheiro fora com pacotinhos repetidos.</h2>
         </div>
         <div class="testimonial-grid">
           <article class="reveal">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=220&q=80" alt="Foto de cliente" />
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=220&q=80" alt="Foto de cliente" />
             <div>
-              <strong>Mariana S.</strong>
+              <strong>Carlos M.</strong>
               <span>Compra verificada</span>
             </div>
-            <p>"Paguei no Pix e o link apareceu logo depois. Consegui abrir o PDF no celular sem problema."</p>
+            <p>"Ja tinha gastado mais de R$ 120 em envelopinhos e meu filho ainda tava longe de completar. Comprei o pack, imprimimos em casa e em uma tarde o album ficou completo."</p>
           </article>
           <article class="reveal">
             <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=220&q=80" alt="Foto de cliente" />
@@ -199,12 +205,12 @@
             <p>"Gostei porque nao precisei esperar atendimento. O checkout mostrou tudo certinho depois do pagamento."</p>
           </article>
           <article class="reveal">
-            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=220&q=80" alt="Foto de cliente" />
+            <img src="https://images.unsplash.com/photo-1496440737103-cd596325d314?auto=format&fit=crop&w=220&q=80" alt="Foto de cliente" />
             <div>
-              <strong>Camila R.</strong>
+              <strong>Ana F.</strong>
               <span>PDF recebido</span>
             </div>
-            <p>"O arquivo veio completo e organizado. Pelo valor, valeu muito para ter o material rapido."</p>
+            <p>"Minha filha ficou frustrada porque so vinham repetidas. Por R$ 29,90 veio tudo de uma vez, organizado, sem repeticao. Nao tem comparacao."</p>
           </article>
         </div>
       </section>
@@ -265,6 +271,7 @@
           </p>
         </details>
       </section>
+
     </main>
 
     <div class="modal" id="checkout-modal" aria-hidden="true">
@@ -326,37 +333,6 @@
           </div>
           <div class="delivery-status" id="delivery-status" role="status"></div>
         </section>
-      </div>
-    </div>
-
-    <div class="modal preview-modal" id="preview-modal" aria-hidden="true">
-      <div class="modal-card preview-modal-card" role="dialog" aria-modal="true" aria-labelledby="preview-title">
-        <button class="modal-close preview-close" aria-label="Fechar">x</button>
-        <div class="modal-header preview-modal-header">
-          <img src="assets/panini-logo.png" alt="Panini" />
-          <div>
-            <span class="eyebrow">Preview</span>
-            <h2 id="preview-title">Preview do PDF do Album da Copa 2026</h2>
-            <p>Visualizacao parcial com Brasil, Argentina e Portugal.</p>
-          </div>
-        </div>
-
-        <div class="pdf-preview-viewer" aria-label="Leitor de preview do PDF">
-          <div class="preview-toolbar">
-            <span>Pagina 1, Pagina 2 e Pagina 3</span>
-          </div>
-          <div class="preview-pages">
-            <figure class="preview-page">
-              <img src="assets/pdf-preview-page-1.png" alt="Pagina de preview com a selecao do Brasil" draggable="false" />
-            </figure>
-            <figure class="preview-page">
-              <img src="assets/pdf-preview-page-2.png" alt="Pagina de preview com a selecao da Argentina" draggable="false" />
-            </figure>
-            <figure class="preview-page">
-              <img src="assets/pdf-preview-page-3.png" alt="Pagina de preview com a selecao de Portugal" draggable="false" />
-            </figure>
-          </div>
-        </div>
       </div>
     </div>
 
