@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const ordersById = new Map();
 const ordersByTransaction = new Map();
 
-function createOrder({ customer, deliveryPreference, item, transactionHash, pixCode }) {
+function createOrder({ customer, deliveryPreference, item, transactionHash, pixCode, metaAttribution }) {
   const id = crypto.randomUUID();
   const downloadToken = crypto.randomBytes(24).toString("hex");
   const order = {
@@ -15,6 +15,7 @@ function createOrder({ customer, deliveryPreference, item, transactionHash, pixC
     deliveryPreference,
     item,
     pixCode,
+    metaAttribution: metaAttribution || {},
     downloadToken,
     deliveryAttempts: [],
     createdAt: new Date().toISOString(),

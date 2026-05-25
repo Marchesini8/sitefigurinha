@@ -26,6 +26,7 @@ let previewTracked = false;
 let latestCustomerData = null;
 
 const activeOrderStorageKey = "active_order";
+const externalIdCookieName = "site_external_id";
 
 function playHeroVideoWithSound() {
   if (!heroVideo) return;
@@ -94,12 +95,33 @@ function getOrCreateFbp() {
   return fbp;
 }
 
+function getOrCreateExternalId() {
+  const existing = getCookie(externalIdCookieName);
+  if (existing) return existing;
+
+  const externalId = window.crypto?.randomUUID
+    ? window.crypto.randomUUID()
+    : `${Date.now()}.${Math.random().toString(16).slice(2)}`;
+  setCookie(externalIdCookieName, externalId, 365);
+  return externalId;
+}
+
 function getMetaUserData(extra = {}) {
   return {
     fbp: getOrCreateFbp(),
     fbc: captureFbclid(),
+    external_id: extra.external_id || getOrCreateExternalId(),
     email: extra.email,
     phone: extra.phone,
+  };
+}
+
+function getMetaAttributionData() {
+  return {
+    fbp: getOrCreateFbp(),
+    fbc: captureFbclid(),
+    external_id: getOrCreateExternalId(),
+    event_source_url: window.location.href,
   };
 }
 
@@ -440,6 +462,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
           phone: onlyDigits(payload.phone),
         },
         deliveryPreference: payload.deliveryPreference,
+        attribution: getMetaAttributionData(),
       }),
     });
 

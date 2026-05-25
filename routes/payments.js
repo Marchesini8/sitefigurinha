@@ -1,6 +1,7 @@
 const express = require("express");
 const paymentService = require("../services/paymentService");
 const orderStore = require("../services/orderStore");
+const metaCapiService = require("../services/metaCapiService");
 
 const router = express.Router();
 
@@ -8,9 +9,25 @@ function sanitizePreference(value) {
   return ["email", "whatsapp", "both"].includes(value) ? value : "email";
 }
 
+function getIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) return String(forwarded).split(",")[0].trim();
+  return req.socket?.remoteAddress || req.ip || "";
+}
+
+function sanitizeAttribution(value = {}) {
+  return {
+    fbp: value.fbp || "",
+    fbc: value.fbc || "",
+    external_id: value.external_id || "",
+    event_source_url: value.event_source_url || "",
+  };
+}
+
 router.post("/checkout", async (req, res) => {
   try {
     const { customer, deliveryPreference } = req.body;
+    const attribution = sanitizeAttribution(req.body.attribution);
 
     if (!customer?.name || !customer?.email || !customer?.phone) {
       return res.status(400).json({
@@ -38,6 +55,12 @@ router.post("/checkout", async (req, res) => {
       item,
       transactionHash: payment.transaction_hash,
       pixCode: payment.pix_code,
+      metaAttribution: {
+        ...attribution,
+        external_id: attribution.external_id || metaCapiService.createExternalId(customer),
+        client_ip_address: getIp(req),
+        client_user_agent: req.headers["user-agent"] || "",
+      },
     });
 
     return res.json({

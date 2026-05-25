@@ -37,6 +37,13 @@ function hashPhone(phone) {
   return normalized ? sha256(normalized) : undefined;
 }
 
+function hashExternalId(externalId) {
+  const normalized = normalizeString(externalId);
+  if (!normalized) return undefined;
+  if (/^[a-f0-9]{64}$/.test(normalized)) return normalized;
+  return sha256(normalized);
+}
+
 function getIp(req) {
   const forwarded = req.headers["x-forwarded-for"];
   if (forwarded) return String(forwarded).split(",")[0].trim();
@@ -52,13 +59,21 @@ function compactObject(value = {}) {
 function buildUserData(req, payload = {}) {
   const userData = payload.user_data || {};
   return compactObject({
-    client_ip_address: getIp(req),
-    client_user_agent: req.headers["user-agent"],
+    client_ip_address: userData.client_ip_address || getIp(req),
+    client_user_agent: userData.client_user_agent || req.headers["user-agent"],
     fbp: userData.fbp,
     fbc: userData.fbc,
+    external_id: hashExternalId(userData.external_id),
     em: hashEmail(userData.email),
     ph: hashPhone(userData.phone),
   });
+}
+
+function createExternalId(customer = {}) {
+  const email = normalizeString(customer.email);
+  const phone = normalizePhone(customer.phone || customer.phone_number);
+  const seed = [email, phone].filter(Boolean).join("|");
+  return seed ? sha256(seed) : undefined;
 }
 
 function buildEvent(req, payload = {}) {
@@ -103,8 +118,11 @@ async function sendEvent(req, payload) {
     event_id: event.event_id,
     has_fbp: Boolean(event.user_data.fbp),
     has_fbc: Boolean(event.user_data.fbc),
+    has_external_id: Boolean(event.user_data.external_id),
     has_email: Boolean(event.user_data.em),
     has_phone: Boolean(event.user_data.ph),
+    has_client_ip_address: Boolean(event.user_data.client_ip_address),
+    has_client_user_agent: Boolean(event.user_data.client_user_agent),
     value: event.custom_data.value,
     currency: event.custom_data.currency,
   });
@@ -150,10 +168,15 @@ async function sendPurchaseFromOrder(req, order) {
   return sendEvent(req, {
     event_name: "Purchase",
     event_id: eventId,
-    event_source_url: getPublicBaseUrl(),
+    event_source_url: order.metaAttribution?.event_source_url || getPublicBaseUrl(),
     user_data: {
       email: order.customer?.email,
       phone: order.customer?.phone,
+      fbp: order.metaAttribution?.fbp,
+      fbc: order.metaAttribution?.fbc,
+      external_id: order.metaAttribution?.external_id,
+      client_ip_address: order.metaAttribution?.client_ip_address,
+      client_user_agent: order.metaAttribution?.client_user_agent,
     },
     custom_data: {
       content_name: order.item?.title || process.env.PRODUCT_NAME || "Album da Copa 2026 Completo em PDF",
@@ -173,6 +196,7 @@ async function sendPurchaseFromOrder(req, order) {
 }
 
 module.exports = {
+  createExternalId,
   sendEvent,
   sendPurchaseFromOrder,
 };
