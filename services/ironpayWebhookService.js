@@ -119,4 +119,5 @@ async function processWebhook(payload, req) {
 module.exports = {
   validateWebhookKey,
   processWebhook,
+  sendPurchaseEvent,
 };

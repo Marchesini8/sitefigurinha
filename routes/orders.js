@@ -3,10 +3,11 @@ const path = require("path");
 const orderStore = require("../services/orderStore");
 const deliveryService = require("../services/deliveryService");
 const paymentStatusStore = require("../services/paymentStatusStore");
+const webhookService = require("../services/ironpayWebhookService");
 
 const router = express.Router();
 
-router.get("/:orderId/status", (req, res) => {
+router.get("/:orderId/status", async (req, res) => {
   let order = orderStore.getOrder(req.params.orderId);
 
   if (!order) {
@@ -20,6 +21,15 @@ router.get("/:orderId/status", (req, res) => {
       isPaid: true,
       paidAt: payment.paidAt || new Date().toISOString(),
     });
+  }
+
+  if (order.isPaid && !order.metaPurchaseEventSent) {
+    if (!order.deliveryAttempts?.length) {
+      await deliveryService.deliverOrder(order);
+    }
+    order = orderStore.getOrder(order.id) || order;
+    await webhookService.sendPurchaseEvent(req, order);
+    order = orderStore.getOrder(order.id) || order;
   }
 
   const payload = {

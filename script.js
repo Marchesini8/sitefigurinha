@@ -26,6 +26,7 @@ let latestCustomerData = null;
 
 const activeOrderStorageKey = "active_order";
 const externalIdCookieName = "site_external_id";
+const trackingStorageKey = "checkout_tracking";
 const purchaseToastMessages = [
   "Gabriel acabou de garantir seu PDF!!",
   "Mariana acabou de garantir seu PDF!!",
@@ -143,6 +144,28 @@ function getMetaAttributionData() {
   };
 }
 
+function getTrackingData() {
+  const params = new URLSearchParams(window.location.search);
+  const keys = ["src", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+  const tracking = {};
+
+  keys.forEach((key) => {
+    tracking[key] = params.get(key) || "";
+  });
+
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(trackingStorageKey) || "{}");
+    keys.forEach((key) => {
+      tracking[key] = tracking[key] || saved[key] || "";
+    });
+    window.localStorage.setItem(trackingStorageKey, JSON.stringify(tracking));
+  } catch {
+    // Tracking is helpful for attribution, but checkout must keep working without localStorage.
+  }
+
+  return tracking;
+}
+
 function createEventId(eventName) {
   if (window.crypto?.randomUUID) {
     return `${eventName}.${window.crypto.randomUUID()}`;
@@ -177,12 +200,14 @@ function trackMetaEvent(eventName, params = {}, options = {}) {
     window.fbq("track", eventName, params, { eventID: eventId });
   }
 
-  sendCapiEvent({
-    eventName,
-    eventId,
-    params,
-    customer,
-  });
+  if (!options.skipCapi) {
+    sendCapiEvent({
+      eventName,
+      eventId,
+      params,
+      customer,
+    });
+  }
 
   return eventId;
 }
@@ -374,6 +399,7 @@ async function checkOrderStatus() {
     if (!hasTrackedPurchase(currentOrderId)) {
       trackMetaEvent("Purchase", purchasePixelParams, {
         eventId: `Purchase.${currentOrderId}`,
+        skipCapi: true,
       });
       markPurchaseTracked(currentOrderId);
     }
@@ -461,6 +487,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
         },
         deliveryPreference: payload.deliveryPreference,
         attribution: getMetaAttributionData(),
+        tracking: getTrackingData(),
       }),
     });
 

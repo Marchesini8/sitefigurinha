@@ -24,10 +24,22 @@ function sanitizeAttribution(value = {}) {
   };
 }
 
+function sanitizeTracking(value = {}) {
+  return {
+    src: value.src || "",
+    utm_source: value.utm_source || "",
+    utm_medium: value.utm_medium || "",
+    utm_campaign: value.utm_campaign || "",
+    utm_term: value.utm_term || "",
+    utm_content: value.utm_content || "",
+  };
+}
+
 router.post("/checkout", async (req, res) => {
   try {
     const { customer, deliveryPreference } = req.body;
     const attribution = sanitizeAttribution(req.body.attribution);
+    const tracking = sanitizeTracking(req.body.tracking);
 
     if (!customer?.name || !customer?.email || !customer?.phone) {
       return res.status(400).json({
@@ -47,6 +59,7 @@ router.post("/checkout", async (req, res) => {
       items: [item],
       customer,
       delivery: {},
+      tracking,
     });
 
     const order = orderStore.createOrder({

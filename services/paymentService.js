@@ -84,7 +84,7 @@ function normalizePostbackUrl(value = "") {
   return configuredUrl;
 }
 
-exports.createPixPayment = async ({ items, customer, delivery }) => {
+exports.createPixPayment = async ({ items, customer, delivery, tracking = {} }) => {
   const normalizedItems = Array.isArray(items) ? items : [];
   const productTotal = normalizedItems.reduce((sum, item) => {
     return sum + normalizeItemPrice(item) * Number(item?.qty || item?.quantity || 1);
@@ -140,12 +140,12 @@ exports.createPixPayment = async ({ items, customer, delivery }) => {
           zip_code: customer.zip_code || delivery?.zip_code || delivery?.cep || "",
         },
         tracking: {
-          src: "",
-          utm_source: "",
-          utm_medium: "",
-          utm_campaign: "",
-          utm_term: "",
-          utm_content: "",
+          src: tracking.src || "",
+          utm_source: tracking.utm_source || "",
+          utm_medium: tracking.utm_medium || "",
+          utm_campaign: tracking.utm_campaign || "",
+          utm_term: tracking.utm_term || "",
+          utm_content: tracking.utm_content || "",
         },
       },
       {
