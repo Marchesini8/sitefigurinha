@@ -73,10 +73,15 @@ function normalizePostbackUrl(value = "") {
     const url = new URL(configuredUrl);
     const normalizedPath = url.pathname.replace(/\/+/g, "/");
 
-    if (normalizedPath === "/ironpay") {
+    if (normalizedPath === "/" || normalizedPath === "" || normalizedPath === "/ironpay") {
       url.pathname = "/api/webhooks/ironpay";
-      return url.toString();
     }
+
+    if (process.env.IRONPAY_WEBHOOK_SECRET && !url.searchParams.has("webhook_secret")) {
+      url.searchParams.set("webhook_secret", process.env.IRONPAY_WEBHOOK_SECRET);
+    }
+
+    return url.toString();
   } catch {
     return configuredUrl;
   }

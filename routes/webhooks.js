@@ -8,7 +8,9 @@ router.post("/ironpay", async (req, res) => {
     const receivedKey =
       req.headers["x-webhook-secret"] ||
       req.headers["x-api-key"] ||
-      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+      req.headers.authorization?.replace(/^Bearer\s+/i, "") ||
+      req.query.webhook_secret ||
+      req.body?.webhook_secret;
 
     webhookService.validateWebhookKey(receivedKey);
 

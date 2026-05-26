@@ -108,8 +108,8 @@ async function processWebhook(payload, req) {
     });
 
     if (normalized.isPaid) {
-      normalized.delivery = await deliveryService.deliverOrder(updated);
       normalized.meta = await sendPurchaseEvent(req, updated);
+      normalized.delivery = await deliveryService.deliverOrder(updated);
     }
   }
 

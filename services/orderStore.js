@@ -1,7 +1,39 @@
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 
 const ordersById = new Map();
 const ordersByTransaction = new Map();
+const storagePath = path.resolve(process.env.ORDER_STORE_FILE || path.join("outputs", "orders.json"));
+
+function ensureStorageDir() {
+  fs.mkdirSync(path.dirname(storagePath), { recursive: true });
+}
+
+function loadOrders() {
+  try {
+    const saved = JSON.parse(fs.readFileSync(storagePath, "utf8"));
+    const orders = Array.isArray(saved.orders) ? saved.orders : [];
+
+    orders.forEach((order) => {
+      if (!order?.id) return;
+      ordersById.set(order.id, order);
+      if (order.transactionHash) ordersByTransaction.set(order.transactionHash, order.id);
+    });
+  } catch {
+    // The store starts empty when there is no persisted file yet.
+  }
+}
+
+function persistOrders() {
+  ensureStorageDir();
+  fs.writeFileSync(
+    storagePath,
+    JSON.stringify({ orders: Array.from(ordersById.values()) }, null, 2)
+  );
+}
+
+loadOrders();
 
 function createOrder({ customer, deliveryPreference, item, transactionHash, pixCode, metaAttribution }) {
   const id = crypto.randomUUID();
@@ -24,6 +56,7 @@ function createOrder({ customer, deliveryPreference, item, transactionHash, pixC
 
   ordersById.set(id, order);
   if (transactionHash) ordersByTransaction.set(transactionHash, id);
+  persistOrders();
 
   return order;
 }
@@ -49,6 +82,7 @@ function updateOrder(id, patch = {}) {
 
   ordersById.set(id, next);
   if (next.transactionHash) ordersByTransaction.set(next.transactionHash, id);
+  persistOrders();
   return next;
 }
 
