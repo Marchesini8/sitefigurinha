@@ -4,6 +4,7 @@ const orderStore = require("../services/orderStore");
 const metaCapiService = require("../services/metaCapiService");
 
 const router = express.Router();
+const PRODUCT_PRICE = 29.9;
 
 function sanitizePreference(value) {
   return ["email", "whatsapp", "both"].includes(value) ? value : "email";
@@ -48,10 +49,9 @@ router.post("/checkout", async (req, res) => {
     }
 
     const productName = process.env.PRODUCT_NAME || "Álbum Completo";
-    const productPrice = Number(process.env.PRODUCT_PRICE || 29.9);
     const item = {
       title: productName,
-      price: productPrice,
+      price: PRODUCT_PRICE,
       quantity: 1,
     };
 
