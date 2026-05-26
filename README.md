@@ -17,7 +17,7 @@ O Railway usa `npm start` e a rota `/health` como healthcheck.
 ## Produto
 
 - Nome: `Álbum Completo`
-- Valor: `R$ 19,90`
+- Valor: `R$ 29,90`
 - Arquivo protegido: `private/Album Completo - Figurinhas.pdf`
 
 O arquivo da pasta `private` não é servido como estático. Ele só sai pela rota de download quando o pedido está pago e com token válido.

@@ -73,12 +73,12 @@ const pixelProductParams = {
   ],
   content_ids: ["album-copa-2026-pdf"],
   currency: "BRL",
-  value: 19.9,
+  value: 29.9,
 };
 
 const purchasePixelParams = {
   ...pixelProductParams,
-  value: 19.9,
+  value: 29.9,
   currency: "BRL",
 };
 
@@ -336,7 +336,7 @@ function setFeedback(message = "", type = "info") {
 }
 
 function resetSubmitButton(button) {
-  if (button) button.textContent = "Gerar Pix de R$ 19,90";
+  if (button) button.textContent = "Gerar Pix de R$ 29,90";
 }
 
 function scrollToPixResult() {

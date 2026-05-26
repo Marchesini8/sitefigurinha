@@ -48,7 +48,7 @@ router.post("/checkout", async (req, res) => {
     }
 
     const productName = process.env.PRODUCT_NAME || "Álbum Completo";
-    const productPrice = Number(process.env.PRODUCT_PRICE || 19.9);
+    const productPrice = Number(process.env.PRODUCT_PRICE || 29.9);
     const item = {
       title: productName,
       price: productPrice,
